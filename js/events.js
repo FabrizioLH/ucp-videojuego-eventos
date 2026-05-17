@@ -57,14 +57,20 @@ const EventStore = (() => {
     let triangulos = 0;
     let cuadrados = 0;
     let puntuacion = 0;
+    let puntuacionMaxima = null;
 
     for (const e of events) {
       switch (e.type) {
-        case EVENT_TYPES.GAME_ENDED:
+        case EVENT_TYPES.GAME_ENDED: {
           partidas += 1;
           tiempoMs += e.durationMs ?? 0;
-          puntuacion += e.score ?? 0;
+          const score = e.score ?? 0;
+          puntuacion += score;
+          if (puntuacionMaxima === null || score > puntuacionMaxima) {
+            puntuacionMaxima = score;
+          }
           break;
+        }
         case EVENT_TYPES.TRIANGLE_DESTROYED:
           triangulos += 1;
           break;
@@ -82,6 +88,7 @@ const EventStore = (() => {
       triangulosDestruidos: triangulos,
       cuadradosDestruidos: cuadrados,
       puntuacionAcumulada: puntuacion,
+      puntuacionMaxima: puntuacionMaxima ?? 0,
     };
   }
 

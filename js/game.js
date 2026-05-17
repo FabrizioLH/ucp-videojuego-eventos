@@ -27,6 +27,7 @@
     totalTriangulos: document.getElementById("total-triangulos"),
     totalCuadrados: document.getElementById("total-cuadrados"),
     totalPuntuacion: document.getElementById("total-puntuacion"),
+    totalPuntuacionMax: document.getElementById("total-puntuacion-max"),
   };
 
   let estado = null;
@@ -261,6 +262,7 @@
     el.totalTriangulos.textContent = t.triangulosDestruidos;
     el.totalCuadrados.textContent = t.cuadradosDestruidos;
     el.totalPuntuacion.textContent = t.puntuacionAcumulada;
+    el.totalPuntuacionMax.textContent = t.puntuacionMaxima;
   }
 
   document.getElementById("btn-iniciar").addEventListener("click", iniciarPartida);
