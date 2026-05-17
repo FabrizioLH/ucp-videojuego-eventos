@@ -15,7 +15,35 @@
 
     <section id="menu-principal" class="panel panel--centered">
       <h2>Menú principal</h2>
-      <p class="hint">Tienes 1 minuto por partida. Cada clic cuenta.</p>
+
+      <aside class="como-jugar" aria-labelledby="como-jugar-titulo">
+        <h3 id="como-jugar-titulo">¿Cómo jugar?</h3>
+        <ol class="como-jugar__lista">
+          <li>
+            Tienes <strong>1 minuto</strong> por partida. La puntuación y el tiempo se muestran arriba del área de juego.
+          </li>
+          <li>
+            En pantalla aparecen siempre un
+            <span class="como-jugar__objeto como-jugar__objeto--triangulo" aria-hidden="true"></span>
+            <strong>triángulo rojo</strong> y un
+            <span class="como-jugar__objeto como-jugar__objeto--cuadrado" aria-hidden="true"></span>
+            <strong>cuadrado azul</strong> en posiciones aleatorias.
+          </li>
+          <li>
+            Haz clic en los <strong>triángulos rojos</strong> para destruirlos y sumar <strong>+10</strong> puntos.
+          </li>
+          <li>
+            Evita los <strong>cuadrados azules</strong>: si los destruyes por error, pierdes <strong>5</strong> puntos.
+          </li>
+          <li>
+            Cada vez que destruyes uno de los dos objetivos, el triángulo y el cuadrado vuelven a aparecer en nuevas posiciones.
+          </li>
+          <li>
+            Al terminar el tiempo verás el resumen de tu partida. En <strong>Estadísticas totales</strong> puedes consultar tu historial (se guarda en el navegador).
+          </li>
+        </ol>
+      </aside>
+
       <div class="btn-group">
         <button type="button" id="btn-iniciar" class="btn btn--primary">Iniciar partida</button>
         <button type="button" id="btn-estadisticas" class="btn btn--secondary">Estadísticas totales</button>
