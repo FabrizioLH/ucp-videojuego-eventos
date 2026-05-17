@@ -123,11 +123,10 @@ body {
 }
 
 .como-jugar__objeto--triangulo {
-  width: 0;
-  height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-bottom: 12px solid var(--triangle);
+  width: 14px;
+  height: 12px;
+  background: var(--triangle);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
 
 .como-jugar__objeto--cuadrado {
@@ -259,12 +258,12 @@ body {
 }
 
 .objetivo--triangulo {
-  width: 0;
-  height: 0;
-  border-left: 28px solid transparent;
-  border-right: 28px solid transparent;
-  border-bottom: 50px solid var(--triangle);
-  background: transparent;
+  width: 56px;
+  height: 50px;
+  padding: 0;
+  border: none;
+  background: var(--triangle);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   filter: drop-shadow(0 4px 8px rgba(220, 38, 38, 0.4));
 }
 
