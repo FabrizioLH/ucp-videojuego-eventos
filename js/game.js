@@ -1,6 +1,4 @@
-/**
- * Juego de reacción: destruir triángulos rojos (+puntos), evitar cuadrados azules (-puntos).
- */
+
 (() => {
   const DURACION_PARTIDA_MS = 60_000;
   const PUNTOS_TRIANGULO = 10;
@@ -57,6 +55,17 @@
     return resto > 0 ? `${min} min ${resto} s` : `${min} min`;
   }
 
+  const TAM_TRIANGULO = { ancho: 56, alto: 50 };
+  const TAM_CUADRADO = { ancho: TAM_OBJETIVO, alto: TAM_OBJETIVO };
+  const SEPARACION_MIN = 24;
+
+  function obtenerDimensionesArea() {
+    return {
+      ancho: el.areaJuego.clientWidth,
+      alto: el.areaJuego.clientHeight,
+    };
+  }
+
   function posicionAleatoria(anchoArea, altoArea, anchoObj, altoObj) {
     const maxX = anchoArea - anchoObj - MARGEN * 2;
     const maxY = altoArea - altoObj - MARGEN * 2;
@@ -66,26 +75,42 @@
     };
   }
 
-  function posicionesSinSolapar(areaRect) {
-    const ancho = areaRect.width;
-    const alto = areaRect.height;
-    const triAlto = 50;
-    const triAncho = 56;
+  function rectangulosSolapan(a, b) {
+    const pad = SEPARACION_MIN / 2;
+    return !(
+      a.x + a.ancho + pad <= b.x ||
+      b.x + b.ancho + pad <= a.x ||
+      a.y + a.alto + pad <= b.y ||
+      b.y + b.alto + pad <= a.y
+    );
+  }
 
-    let posTri = posicionAleatoria(ancho, alto, triAncho, triAlto);
-    let posCuad = posicionAleatoria(ancho, alto, TAM_OBJETIVO, TAM_OBJETIVO);
+  function posicionesSinSolapar(ancho, alto) {
+    const rectTri = () => ({
+      ...posicionAleatoria(ancho, alto, TAM_TRIANGULO.ancho, TAM_TRIANGULO.alto),
+      ancho: TAM_TRIANGULO.ancho,
+      alto: TAM_TRIANGULO.alto,
+    });
+    const rectCuad = () => ({
+      ...posicionAleatoria(ancho, alto, TAM_CUADRADO.ancho, TAM_CUADRADO.alto),
+      ancho: TAM_CUADRADO.ancho,
+      alto: TAM_CUADRADO.alto,
+    });
+
+    let tri = rectTri();
+    let cuad = rectCuad();
     let intentos = 0;
 
-    while (intentos < 40) {
-      const solapan =
-        Math.abs(posTri.x - posCuad.x) < TAM_OBJETIVO + 20 &&
-        Math.abs(posTri.y - posCuad.y) < TAM_OBJETIVO + 20;
-      if (!solapan) break;
-      posCuad = posicionAleatoria(ancho, alto, TAM_OBJETIVO, TAM_OBJETIVO);
+    while (rectangulosSolapan(tri, cuad) && intentos < 50) {
+      cuad = rectCuad();
       intentos++;
+      if (intentos % 10 === 0) tri = rectTri();
     }
 
-    return { triangulo: posTri, cuadrado: posCuad };
+    return {
+      triangulo: { x: tri.x, y: tri.y },
+      cuadrado: { x: cuad.x, y: cuad.y },
+    };
   }
 
   function crearObjetivo(tipo, x, y) {
@@ -122,8 +147,14 @@
 
   function spawnObjetivos() {
     el.areaJuego.querySelectorAll(".objetivo").forEach((n) => n.remove());
-    const rect = el.areaJuego.getBoundingClientRect();
-    const { triangulo, cuadrado } = posicionesSinSolapar(rect);
+
+    const { ancho, alto } = obtenerDimensionesArea();
+    if (ancho < 50 || alto < 50) {
+      requestAnimationFrame(spawnObjetivos);
+      return;
+    }
+
+    const { triangulo, cuadrado } = posicionesSinSolapar(ancho, alto);
 
     el.areaJuego.appendChild(crearObjetivo("triangulo", triangulo.x, triangulo.y));
     el.areaJuego.appendChild(crearObjetivo("cuadrado", cuadrado.x, cuadrado.y));
@@ -214,8 +245,8 @@
     });
 
     actualizarHud();
-    spawnObjetivos();
     mostrarPantalla("juego");
+    requestAnimationFrame(() => spawnObjetivos());
 
     timerInterval = setInterval(() => {
       actualizarHud();
