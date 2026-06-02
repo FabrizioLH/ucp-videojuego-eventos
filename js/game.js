@@ -38,8 +38,12 @@
   let nombreJugador = "Jugador Anonimo";
 
   // Inicializar conexión con el servidor de la UCP
+  // Inicializar conexión con el servidor de la UCP
   function conectarWebSocket() {
     socket = new WebSocket('wss://gamehubmanager.azurewebsites.net/ws');
+
+    // Capturamos el contenedor de la lista en la UI
+    const listaNode = document.getElementById("ranking-lista-rt");
 
     socket.onopen = () => {
       console.log('📡 Conectado al servidor de WebSocket de la UCP');
@@ -47,7 +51,6 @@
 
     socket.onmessage = (event) => {
       try {
-        // El servidor responde con un string JSON de la lista de posiciones
         const datosRanking = JSON.parse(event.data);
         actualizarRankingUI(datosRanking);
       } catch (error) {
@@ -57,11 +60,26 @@
 
     socket.onclose = () => {
       console.log('🔌 Conexión cerrada. Intentando reconectar en 3 segundos...');
+      
+      // NUEVO: Avisar visualmente en la interfaz que se perdió la conexión
+      if (listaNode) {
+        listaNode.innerHTML = `<li style="color: var(--muted); list-style: none; font-size: 0.85rem;">
+          ⚠️ Desconectado del servidor. Reconectando...
+        </li>`;
+      }
+      
       setTimeout(conectarWebSocket, 3000); // Reconexión automática
     };
 
     socket.onerror = (error) => {
       console.error('❌ Error en WebSocket:', error);
+      
+      // NUEVO: Avisar visualmente que el servidor está inaccesible o caído
+      if (listaNode) {
+        listaNode.innerHTML = `<li style="color: var(--danger); list-style: none; font-size: 0.85rem;">
+          ❌ Servidor de ranking fuera de línea.
+        </li>`;
+      }
     };
   }
 
