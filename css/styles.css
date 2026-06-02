@@ -347,3 +347,52 @@ body {
 .stats-list strong {
   font-variant-numeric: tabular-nums;
 }
+
+/* Ranking en Tiempo Real */
+.ranking-rt {
+  background: var(--surface-2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ranking-rt h3 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.25rem;
+}
+
+.ranking-rt ol {
+  padding-left: 1.20rem;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ranking-rt li {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Modificación para pantallas medianas/grandes: flotar al costado del área si hay espacio */
+@media (min-width: 768px) {
+  #pantalla-juego {
+    position: relative;
+  }
+  .ranking-rt {
+    position: absolute;
+    right: 2.75rem;
+    top: 6.5rem;
+    width: 200px;
+    z-index: 20;
+    box-shadow: var(--shadow);
+    background: rgba(26, 35, 50, 0.95); /* Un toque de transparencia */
+    backdrop-filter: blur(4px);
+  }
+}

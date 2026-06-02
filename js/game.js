@@ -33,6 +33,71 @@
   let estado = null;
   let timerInterval = null;
 
+  // VARIABLES PARA WEBSOCKET
+  let socket = null;
+  let nombreJugador = "Jugador Anonimo";
+
+  // Inicializar conexión con el servidor de la UCP
+  function conectarWebSocket() {
+    socket = new WebSocket('wss://gamehubmanager.azurewebsites.net/ws');
+
+    socket.onopen = () => {
+      console.log('📡 Conectado al servidor de WebSocket de la UCP');
+    };
+
+    socket.onmessage = (event) => {
+      try {
+        // El servidor responde con un string JSON de la lista de posiciones
+        const datosRanking = JSON.parse(event.data);
+        actualizarRankingUI(datosRanking);
+      } catch (error) {
+        console.error('Error al procesar el ranking entrante:', error);
+      }
+    };
+
+    socket.onclose = () => {
+      console.log('🔌 Conexión cerrada. Intentando reconectar en 3 segundos...');
+      setTimeout(conectarWebSocket, 3000); // Reconexión automática
+    };
+
+    socket.onerror = (error) => {
+      console.error('❌ Error en WebSocket:', error);
+    };
+  }
+
+  // Renderizar la lista recibida por la red
+  function actualizarRankingUI(ranking) {
+    const listaNode = document.getElementById("ranking-lista-rt");
+    if (!listaNode) return;
+
+    listaNode.innerHTML = "";
+
+    // Muestra los primeros 5 puestos
+    ranking.slice(0, 5).forEach((item) => {
+      const li = document.createElement("li");
+      // Mapeamos dinámicamente por si las keys vienen con variaciones de mayúsculas (Player/Value)
+      const nombre = item.Player || item.player || "Anónimo";
+      const puntaje = item.Value !== undefined ? item.Value : (item.value !== undefined ? item.value : 0);
+      
+      li.innerHTML = `<strong>${nombre}</strong>: ${puntaje} pts`;
+      listaNode.appendChild(li);
+    });
+  }
+
+  // Enviar evento de actualización de posición al servidor
+  function transmitirPuntajeRed(valorPuntaje) {
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+    const payload = {
+      "game": "ReaccionRapida", // Nombre identificador de tu juego
+      "event": "posicion",      // Evento solicitado en el TP
+      "player": nombreJugador,
+      "value": parseInt(valorPuntaje)
+    };
+
+    socket.send(JSON.stringify(payload));
+  }
+
   function mostrarPantalla(nombre) {
     Object.entries(pantallas).forEach(([key, section]) => {
       const visible = key === nombre;
@@ -192,6 +257,14 @@
 
     actualizarHud();
 
+    // NUEVO: Transmitir el nuevo puntaje al servidor en tiempo real
+    transmitirPuntajeRed(estado.puntuacion);
+
+    setTimeout(() => {
+      node.remove();
+      if (estado?.activo) spawnObjetivos();
+    }, 180);
+
     setTimeout(() => {
       node.remove();
       if (estado?.activo) spawnObjetivos();
@@ -228,6 +301,12 @@
 
   function iniciarPartida() {
     if (estado?.activo) return;
+
+    // Solicitar nombre para el ranking de red
+    const nombreIngresado = prompt("Ingresa tu nombre para el ranking:", nombreJugador);
+    if (nombreIngresado && nombreIngresado.trim() !== "") {
+      nombreJugador = nombreIngresado.trim();
+    }
 
     const sessionId = crypto.randomUUID?.() ?? String(Date.now());
 
@@ -281,5 +360,7 @@
   });
 
   EventStore.record(EventStore.EVENT_TYPES.APP_LOADED);
+  // Conectar al servidor al cargar la aplicación
+  conectarWebSocket();
   mostrarPantalla("menu");
 })();
