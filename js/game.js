@@ -37,6 +37,19 @@
   let socket = null;
   let nombreJugador = "Jugador Anonimo";
 
+  // CONTEXTO PWA: Registro del Service Worker al cargar la página
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then((reg) => {
+          console.log('🚀 Service Worker registrado con éxito. Scope:', reg.scope);
+        })
+        .catch((err) => {
+          console.error('❌ Error al registrar el Service Worker:', err);
+        });
+    });
+  }
+  
   // Inicializar conexión con el servidor de la UCP
   // Inicializar conexión con el servidor de la UCP
   function conectarWebSocket() {
