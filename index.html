@@ -4,12 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reacción Rápida — Triángulos vs Cuadrados</title>
+  
   <link rel="manifest" href="manifest.json">
+  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Reacción Rápida">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  
+  <link rel="apple-touch-icon" href="icon.svg">
+  
   <link rel="stylesheet" href="css/styles.css">
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then((reg) => {
+            console.log('🚀 Service Worker registrado con éxito en el alcance:', reg.scope);
+          })
+          .catch((err) => {
+            console.error('❌ Error al registrar el Service Worker:', err);
+          });
+      });
+    }
+  </script>
 </head>
 <body>
   <div class="app">
