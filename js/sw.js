@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reaccion-rapida-v1';
+const CACHE_NAME = 'reaccion-rapida-v2'; // Cambiamos de v1 a v2 para forzar la actualización
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,10 +6,10 @@ const ASSETS_TO_CACHE = [
   './js/events.js',
   './js/game.js',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-192.png',
-  './icons/icon-maskable-512.png'
+  './icon.svg',
+  './icon-maskable.svg',
+  './screenshot-desktop.svg',
+  './screenshot-mobile.svg'
 ];
 
 // Evento de Instalación: Se descargan los componentes estáticos esenciales
