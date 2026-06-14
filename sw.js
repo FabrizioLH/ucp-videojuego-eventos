@@ -37,31 +37,32 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Evento Fetch (Omite WebSockets del ranking en tiempo real)
+// Evento Fetch: Intercepta peticiones para servir contenido offline
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.startsWith('ws://') || event.request.url.startsWith('https://gamehubmanager.azurewebsites.net') || event.request.url.startsWith('wss://')) {
-    return; 
-  }
-
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+    // Omitir peticiones de WebSockets del ranking en tiempo real
+    if (event.request.url.startsWith('ws://') || event.request.url.startsWith('https://gamehubmanager.azurewebsites.net') || event.request.url.startsWith('wss://')) {
+      return; 
+    }
+  
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+  
+        return fetch(event.request).then((networkResponse) => {
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
+          }
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
           return networkResponse;
-        }
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-        return networkResponse;
-      }).catch(() => {
-        if (event.request.mode === 'navigate') {
+        }).catch(() => {
+          // Truco para PWABuilder: Si falla la red al navegar o testear, devolvemos siempre el index
           return caches.match('index.html');
-        }
-      });
-    })
-  );
-});
+        });
+      })
+    );
+  });
